@@ -114,10 +114,10 @@ public class ProductController {
 		
 		if(result > 0) {
 			new ProductMenu().displaySuccess("성공적으로 출고하였습니다.");
-		} else if(result == 0) {
-			new ProductMenu().displayFail("출고 실패하였습니다");
-		} else if(result == -1) {
+		} else if(result == -1){
 			new ProductMenu().displayFail("출고하고자 하는 제품의 재고수량이 부족합니다.");
+		} else {
+			new ProductMenu().displayFail("해당하는 제품이 없습니다.");
 		}
 	}
 }

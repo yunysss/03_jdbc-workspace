@@ -146,17 +146,28 @@ public class ProductMenu {
 	}
 	
 	public void displayProductList(ArrayList<Product> list) {
-		System.out.println("\n=== 조회 결과 ===\n");
+		System.out.println("\n============== 상품 리스트 ==============\n");
+		System.out.println("상품ID\t상품명\t가격\t부가설명\t재고수량");
+		
 		for(int i=0; i<list.size(); i++) {
-			System.out.println(list.get(i));
+			System.out.printf("%s\t%s\t%d\t%s\t%d\t\n", list.get(i).getProductID()
+					                                  , list.get(i).getProductName()
+					                                  , list.get(i).getPrice()
+					                                  , list.get(i).getDescription()
+					                                  , list.get(i).getStock());
 		}
 	}
 	
 	public void displayProductIOList(ArrayList<ProductIO> list) {
-		System.out.println("\n======================= 입고 리스트 =======================");
+		System.out.println("\n======================= " + list.get(0).getStatus() + " 리스트 =======================");
 		System.out.println("입출고번호\t상품ID\t상품명\t입출고일\t\t입출고수량\t입출고상태");
 		for(int i=0; i<list.size(); i++) {
-			System.out.printf("%d\t%s\t%s\t%s\t%d\t%s\n", list.get(i).getIoNum(), list.get(i).getProductId(), list.get(i).getProductName(), list.get(i).getIoDate(), list.get(i).getAmount(), list.get(i).getStatus());
+			System.out.printf("%d\t%s\t%s\t%s\t%d\t%s\n", list.get(i).getIoNum()
+														, list.get(i).getProductId()
+														, list.get(i).getProductName()
+														, list.get(i).getIoDate()
+														, list.get(i).getAmount()
+														, list.get(i).getStatus());
 		}
 	}
 	

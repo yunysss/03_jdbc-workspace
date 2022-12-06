@@ -275,14 +275,24 @@ public class ProductDao {
 		PreparedStatement pstmt = null;
 		
 		String sql = prop.getProperty("productOutput");
-		
+		ArrayList<Product> list = selectProduct(conn);
 	
 		try {
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setString(1, productId);
-			pstmt.setInt(2, amount);
+			for(int i=0; i<list.size(); i++) {
+				if(list.get(i).getProductID().equals(productId)) {
+					if(list.get(i).getStock() >= amount) {
+						pstmt = conn.prepareStatement(sql);
+						pstmt.setString(1, productId);
+						pstmt.setInt(2, amount);
+						
+						result = pstmt.executeUpdate();
+					} else if(list.get(i).getStock() < amount) {
+						result = -1;
+					}
+				}
+			}
 			
-			result = pstmt.executeUpdate();
+			
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
