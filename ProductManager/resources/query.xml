@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+
+	<entry key="selectProduct">
+		SELECT
+			   PRODUCT_ID
+			 , P_NAME
+			 , PRICE
+			 , DESCRIPTION
+			 , STOCK
+		  FROM 
+		  	   PRODUCT 
+	</entry>
+	
+	<entry key="insertProduct">
+		INSERT
+		  INTO 
+		       PRODUCT(
+		  			   PRODUCT_ID
+		  			 , P_NAME
+		  			 , PRICE
+		  			 , DESCRIPTION
+		  			 , STOCK)
+ 		VALUES(
+ 			   ?
+ 			 , ?
+ 			 , ?
+ 			 , ?
+ 			 , ?)
+	</entry>
+	
+	<entry key="updateProduct">
+		UPDATE 
+			   PRODUCT
+		   SET 
+		       P_NAME = ?
+		     , PRICE = ?
+		     , DESCRIPTION = ?
+		     , STOCK = ?  	   
+	     WHERE 
+	           PRODUCT_ID = ?
+	</entry>
+	
+	<entry key="deleteProduct">
+		DELETE 
+		  FROM 
+		       PRODUCT
+		 WHERE
+		       PRODUCT_ID = ?
+	</entry>
+	
+	<entry key="selectByProductName">
+		SELECT
+			   PRODUCT_ID
+			 , P_NAME
+			 , PRICE
+			 , DESCRIPTION
+			 , STOCK
+		  FROM PRODUCT
+		 WHERE
+		 	   P_NAME LIKE '%' || ? || '%'  
+	</entry>
+	
+	<entry key="selectProductIO">
+		SELECT 
+			   IO_NUM
+			 , PRODUCT_ID
+			 , P_NAME
+			 , IO_DATE
+			 , AMOUNT
+			 , STATUS
+		  FROM PRODUCT_IO   
+		  JOIN PRODUCT USING(PRODUCT_ID)
+	</entry>	
+	
+	<entry key='selectInput'>
+		SELECT 
+			   IO_NUM
+			 , PRODUCT_ID
+			 , P_NAME
+			 , IO_DATE
+			 , AMOUNT
+			 , STATUS
+		  FROM PRODUCT_IO   
+		  JOIN PRODUCT USING(PRODUCT_ID)
+		 WHERE STATUS = '입고'	
+	</entry>
+	
+	<entry key='selectOutput'>
+		SELECT 
+			   IO_NUM
+			 , PRODUCT_ID
+			 , P_NAME
+			 , IO_DATE
+			 , AMOUNT
+			 , STATUS
+		  FROM PRODUCT_IO   
+		  JOIN PRODUCT USING(PRODUCT_ID)
+		 WHERE STATUS = '출고'	
+			   
+	</entry>
+	
+	<entry key="productInput">
+		INSERT 
+		  INTO 
+			   PRODUCT_IO 
+		VALUES(SEQ_IONO.NEXTVAL
+		     , ?
+		     , SYSDATE
+		     , ?
+		     , '입고')
+	</entry>
+
+	<entry key="productOutput">
+		INSERT
+		  INTO
+		       PRODUCT_IO
+	    VALUES(SEQ_IONO.NEXTVAL
+	         , ?
+	         , SYSDATE
+	         , ?
+	         , '출고')
+	</entry>
+</properties>
