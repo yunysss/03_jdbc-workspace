@@ -2,29 +2,31 @@ package com.br.model.vo;
 
 public class Product {
 	
-	private String productID;
+	private String productId;
 	private String productName;
 	private int price;
 	private String description;
 	private int stock;
 	
-	public Product() {}
-
-	public Product(String productID, String productName, int price, String description, int stock) {
+	public Product() {
+		
+	}
+	
+	public Product(String productId, String productName, int price, String description, int stock) {
 		super();
-		this.productID = productID;
+		this.productId = productId;
 		this.productName = productName;
 		this.price = price;
 		this.description = description;
 		this.stock = stock;
 	}
 
-	public String getProductID() {
-		return productID;
+	public String getProductId() {
+		return productId;
 	}
 
-	public void setProductID(String productID) {
-		this.productID = productID;
+	public void setProductId(String productId) {
+		this.productId = productId;
 	}
 
 	public String getProductName() {
@@ -61,8 +63,7 @@ public class Product {
 
 	@Override
 	public String toString() {
-		return productID + "\t" + productName + "\t" + price + "\t" + description + "\t" + stock;
+		return productId + "\t" + productName + "\t" + price + "\t" + description + "\t" + stock;
 	}
 	
-
 }

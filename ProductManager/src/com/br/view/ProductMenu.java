@@ -149,25 +149,16 @@ public class ProductMenu {
 		System.out.println("\n============== 상품 리스트 ==============\n");
 		System.out.println("상품ID\t상품명\t가격\t부가설명\t재고수량");
 		
-		for(int i=0; i<list.size(); i++) {
-			System.out.printf("%s\t%s\t%d\t%s\t%d\t\n", list.get(i).getProductID()
-					                                  , list.get(i).getProductName()
-					                                  , list.get(i).getPrice()
-					                                  , list.get(i).getDescription()
-					                                  , list.get(i).getStock());
+		for(Product p : list) {
+			System.out.println(p);
 		}
 	}
 	
 	public void displayProductIOList(ArrayList<ProductIO> list) {
 		System.out.println("\n======================= " + list.get(0).getStatus() + " 리스트 =======================");
 		System.out.println("입출고번호\t상품ID\t상품명\t입출고일\t\t입출고수량\t입출고상태");
-		for(int i=0; i<list.size(); i++) {
-			System.out.printf("%d\t%s\t%s\t%s\t%d\t%s\n", list.get(i).getIoNum()
-														, list.get(i).getProductId()
-														, list.get(i).getProductName()
-														, list.get(i).getIoDate()
-														, list.get(i).getAmount()
-														, list.get(i).getStatus());
+		for(ProductIO pIo : list) {
+			System.out.println(pIo);
 		}
 	}
 	
@@ -176,7 +167,7 @@ public class ProductMenu {
 	}
 	
 	public void displayFail(String message) {
-		System.out.println("\n사용자 요청 실패 : " + message);
+		System.err.println("\n사용자 요청 실패 : " + message);
 	}
 
 }

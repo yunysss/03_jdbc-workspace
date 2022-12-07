@@ -11,7 +11,9 @@ public class ProductIO {
 	private int amount;
 	private String status;
 	
-	public ProductIO() {}
+	public ProductIO() {
+		
+	}
 
 	public ProductIO(int ioNum, String productId, String productName, Date ioDate, int amount, String status) {
 		super();
@@ -77,4 +79,7 @@ public class ProductIO {
 				+ "\t" + amount + "\t" + status;
 	}
 	
+	
+	
+
 }
