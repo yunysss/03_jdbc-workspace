@@ -100,3 +100,165 @@
 C:\oraclexe\app\oracle\product\11.2.0\server\jdbc\lib\ojdbc6 복사 후 C:드라이브에 dev 폴더 생성 후 붙여넣기 ⇒ eclipse project 우클릭 ⇒ Properties ⇒ Java Build Path ⇒ Libraries ⇒ Add Externaml JARs에서 추가
 ## 2. MVC
 ### 2_1. MVC
+
+![화면 캡처 2022-12-14 160530](https://user-images.githubusercontent.com/115604544/207528626-07ad83e0-ced0-45d9-aed1-859ed3df0e83.png)
+
+- M (Model) : 데이터 처리 담당
+- V (View) : 화면을 담당 (출력 및 입력)
+- C (Controller) : 사용자의 요청을 처리해주는 담당 
+### 2_2. Statement vs. PreparedStatement
+- 둘 다 sql문을 실행하고 결과를 받아내는 객체 (둘 중에 하나 이용)
+- Statement가 PreparedStatement의 부모 (상속구조)
+- 차이점
+  - Statement : sql문을 바로 전달하면서 실행시키는 객체 (sql문을 완성형태로 만들어 둬야함 == 사용자가 입력한 값들이 다 채워진 형태)
+    ```
+    1) Connection 객체를 통해 Statement 객체 생성
+    > stmt = conn.createStatement();
+    2) Statement 객체를 통해 sql문 실행 결과 받기
+    > 결과 = stmt.executeXXX(완성된sql문);
+    ```
+  - PreparedStatement : "미완성된 sql문"을 잠시 보관해둘 수 있는 객체 (사용자가 입력한 값들을 채워두지 않고 각각 들어갈 공간만 미리 확보)
+    ```
+    1) Connection 객체를 통해 PreparedStatement 객체 생성   
+    > pstmt = conn.prepareStatement([미]완성된sql문); => ? (== holder) 공간 확보
+    2) pstmt에 담긴 sql문이 미완성된 상태일 경우 우선 완성시켜야함
+    > pstmt.setXXX(1, "대체할값");   
+    > pstmt.setXXX(2, "대체할값");   
+        ...   
+    => pstmt.setString(홀더순번, 대체할값);	=> '대체할값' (양옆에 홑따옴표 감싸준 상태로 들어감)   
+      pstmt.setInt(홀더순번, 대체할값);	=> 대체할값   
+    3) 해당 완성된 sql문 실행 결과 받기   
+    > 결과 = pstmt.executeXXX();    
+    ```
+### 2_3. Properties 활용
+- 정적코딩방식 : jdbc driver구문, 접속할 db의 url, 계정명, 비번이 자바코드내에 명시적으로 작성 
+  - 문제점 : dbms가 변경되었을 경우, 접속할 db의 url, 계정명/비번이 변경될 경우 ⇒ 자바소스코드 수정   
+  ⇒ 수정된 내용을 반영시키고자 한다면 프로그램 재구동해야됨 (프로그램이 비정상적으로 종료됐다가 다시 구동)   
+  ⇒ 사용자 입장에서 프로그램이 멈추는 상황
+- 동적코딩방식 : db관련된 구문들을 별도로 관리하는 외부 파일(.properties)을 만들어서 관리
+  - 외부파일로부터 읽어들여서 반영이 되도록 코드 짜놓음    
+  ⇒ 수정될 일이 있다면 자바코드가 아닌 외부파일을 열어서 수정 
+  ⇒ 프로그램 재구동시킬 필요 없음
+  - properties
+    - map계열의 컬렉션으로 키+밸류 세트로 저장
+    - 주로 키, 밸류 모두 문자열로 기술
+    - .properties 또는 .xml 파일과 작업
+    - driver.properties
+      ```
+      driver=oracle.jdbc.driver.OracleDriver
+      url=jdbc:oracle:thin:@localhost:1521:xe
+      username=JDBC
+      password=JDBC
+      ```
+    - query.xml
+      ```xml
+      <?xml version="1.0" encoding="UTF-8"?>
+      <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+      <properties>
+        <entry key="insertMember">
+          INSERT
+            INTO MEMBER(USER_NO, USER_ID, USER_PWD, USER_NAME, GENDER, AGE, EMAIL, PHONE, ADDRESS, HOBBY, ENROLL_DATE)
+          VALUES(SEQ_USERNO.NEXTVAL, ?, ?, ?, ?, ?, ?, ?, ?, ?, SYSDATE)                       
+        </entry>
+      </properties>
+      ```
+    - 전역변수로 Properties 생성 후 기본 생성자에 load 메소드 실행 : 사용자가 어떤 서비스 요청 할때마다 결국 new MemberDao().xxxxxx(); 호출하기 때문에
+      ```java
+      public class MemberDao {
+        private Properties prop = new Properties();
+
+        public MemberDao() {
+          try {
+            prop.loadFromXML(new FileInputStream("resources/query.xml"));
+          } catch (IOException e) {
+            e.printStackTrace();
+          }
+        }
+      }
+      ```
+    - .getproperty(String key)로 접근
+### 2_4. JDBCTemplate (공통 템플릿) : 매번 반복적으로 작성될 코드를 메소드로 정의
+```java
+public class JDBCTemplate {
+
+	// 1. Connection 객체 생성 (DB와 접속) 후 해당 생성된 Connection 반환해주는 메소드
+	public static Connection getConnection() {
+		
+		Properties prop = new Properties();
+		Connection conn = null;
+		try {
+			prop.load(new FileInputStream("resources/driver.properties"));
+			
+			Class.forName(prop.getProperty("driver"));
+			conn = DriverManager.getConnection(prop.getProperty("url"), prop.getProperty("username"), prop.getProperty("password"));
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return conn;
+	}
+	
+	// 2. commit 처리해주는 메소드 (Connection 전달받아서)
+	public static void commit(Connection conn) {
+		try {
+			if(conn != null && !conn.isClosed()) {
+				conn.commit();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	// 3. rollback 처리해주는 메소드 (Connection 전달받아서)\
+	public static void rollback(Connection conn) {
+		try {
+			if(conn != null && !conn.isClosed()) {
+				conn.rollback();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	// 4. Connection 객체 전달받아서 반납시켜주는 메소드
+	public static void close(Connection conn) {
+		try {
+			if(conn != null && !conn.isClosed()) {
+				conn.close();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	// 5. Statement 관련 객체 전달받아서 반납시켜주는 메소드
+	public static void close(Statement stmt) {
+		try {
+			if(stmt != null && !stmt.isClosed()) {
+				stmt.close();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	// 6. ResultSet 객체 전달받아서 반납시켜주는 메소드
+	public static void close(ResultSet rset) {
+		try {
+			if(rset != null && !rset.isClosed()) {
+				rset.close();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+}
+```
+- 다른 클래스에서 JDBCTemplate import 시 import static com.br.common.JDBCTemplate.*; 하여 바로 메소드에 접근할 수 있게 하기
